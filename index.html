@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrammrDemon - The Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Shared demonic theme styles from homepage */
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #0A0A0A;
+            color: #EAEAEA;
+        }
+        .font-hacker {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .text-crimson { color: #DC143C; }
+        .bg-crimson { background-color: #DC143C; }
+        .border-crimson { border-color: #DC143C; }
+        .shadow-crimson { box-shadow: 0 0 15px rgba(220, 20, 60, 0.6); }
+
+        /* Editor-specific styles */
+        .main-editor {
+            background-color: #121212;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+        }
+        .editor-textarea {
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            caret-color: #DC143C;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        .sidebar {
+            background-color: #0F0F0F;
+            border-left: 1px solid #2a2a2a;
+        }
+        .sidebar-tab {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-tab.active, .sidebar-tab:hover {
+            background-color: #1a1a1a;
+            border-left-color: #DC143C;
+            color: #DC143C;
+        }
+        .sidebar-tab.active .tab-icon, .sidebar-tab:hover .tab-icon {
+            transform: scale(1.1);
+        }
+        .theme-toggle {
+            background-color: #2a2a2a;
+            border-radius: 99px;
+            cursor: pointer;
+            padding: 4px;
+            position: relative;
+        }
+        .theme-toggle-slider {
+            position: absolute;
+            top: 4px;
+            background-color: #DC143C;
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            width: 24px;
+            height: 24px;
+        }
+        html.dark .theme-toggle-slider {
+            transform: translateX(32px);
+        }
+        .underline-error {
+            text-decoration: underline;
+            text-decoration-color: #DC143C;
+            text-decoration-style: wavy;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-black">
+
+    <div class="flex h-screen w-full text-gray-200">
+        <!-- Main Editor Area -->
+        <main class="flex-1 flex flex-col p-4 md:p-6">
+            <!-- Header -->
+            <header class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-3">
+                     <a href="#" class="flex items-center space-x-2">
+                        <svg class="w-7 h-7 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1.5c-3.038 0-5.5 2.462-5.5 5.5 0 2.243 1.344 4.163 3.25 5.016.162.073.328.15.498.23.002 0 .004 0 .005.002C10.253 12.247 10 12.5 10 13v1.5a.5.5 0 00.5.5h3a.5.5 0 00.5-.5V13c0-.5-.253-.753-.253-.753l.005-.002c.17-.08.336-.157.498-.23C16.156 11.163 17.5 9.243 17.5 7c0-3.038-2.462-5.5-5.5-5.5zM8.5 7c0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5c0 1.93-1.57 3.5-3.5 3.5S8.5 8.93 8.5 7zM12 16.5c-1.5 0-3 1-3 3v1h6v-1c0-2-1.5-3-3-3z"></path><path d="M9.5 7.5c.667.667 1.333 1 2.5 1s1.833-.333 2.5-1"></path></svg>
+                        <h1 class="font-hacker text-xl font-bold">GrammrDemon</h1>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="theme-toggle" class="theme-toggle flex items-center space-x-2">
+                        <span class="text-yellow-400">😇</span> <!-- Holy -->
+                        <span class="text-purple-400">😈</span> <!-- Demonic -->
+                        <div class="theme-toggle-slider"></div>
+                    </div>
+                    <button class="font-hacker bg-crimson text-white px-4 py-2 rounded-md text-sm hover:opacity-90 transition-opacity">Export Report</button>
+                </div>
+            </header>
+
+            <!-- Text Input Box -->
+            <div class="main-editor flex-1 p-6 overflow-y-auto">
+                <div id="editor-content" contenteditable="true" class="editor-textarea w-full h-full outline-none">
+                    <p>Type or paste you're text hear. GrammrDemon will <span class="underline-error" title="Potential word choice issue.">imediately</span> begin its unholy work. It checks for grammer, style, and tone. This is an example of a sentence that could be improved, it is written in the passive voice.</p>
+                    <p><br></p>
+                    <p>Maybe you think this sentence could be more confident. Consider rewriting it.</p>
+                </div>
+            </div>
+            
+            <!-- Footer/Stats -->
+            <footer class="text-xs text-gray-500 font-hacker mt-2 p-2 flex justify-between">
+                <span>Words: 48</span>
+                <span>Clarity Score: 66</span>
+                <span>Devil's Style: 82</span>
+            </footer>
+        </main>
+
+        <!-- Sidebar for Analysis -->
+        <aside class="w-80 md:w-96 sidebar flex-shrink-0 flex flex-col">
+            <header class="p-4 border-b border-gray-800">
+                <h2 class="font-hacker text-lg font-bold">Infernal Analysis</h2>
+            </header>
+            
+            <!-- Tabs -->
+            <div class="flex flex-col font-hacker text-sm">
+                <button data-tab="corrections" class="sidebar-tab active flex items-center space-x-3 p-4 text-left">
+                    <span class="tab-icon">🔥</span><span>Corrections (3)</span>
+                </button>
+                <button data-tab="rewrites" class="sidebar-tab flex items-center space-x-3 p-4 text-left">
+                    <span class="tab-icon">✍️</span><span>Rewrites</span>
+                </button>
+                <button data-tab="tone" class="sidebar-tab flex items-center space-x-3 p-4 text-left">
+                    <span class="tab-icon">🎭</span><span>Tone</span>
+                </button>
+                <button data-tab="vocabulary" class="sidebar-tab flex items-center space-x-3 p-4 text-left">
+                    <span class="tab-icon">📖</span><span>Vocabulary</span>
+                </button>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="flex-1 p-4 overflow-y-auto">
+                <!-- Corrections Content -->
+                <div id="tab-content-corrections" class="tab-content space-y-4">
+                    <div class="bg-gray-900 p-3 rounded-md border border-gray-700">
+                        <p class="text-sm text-gray-400">"you're" → "your"</p>
+                        <p class="text-xs mt-1">Spelling mistake.</p>
+                        <div class="mt-2 space-x-2">
+                            <button class="px-2 py-1 text-xs bg-green-600 rounded">Accept</button>
+                            <button class="px-2 py-1 text-xs bg-gray-600 rounded">Ignore</button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 p-3 rounded-md border border-gray-700">
+                        <p class="text-sm text-gray-400">"hear" → "here"</p>
+                        <p class="text-xs mt-1">Incorrect word usage.</p>
+                        <div class="mt-2 space-x-2">
+                            <button class="px-2 py-1 text-xs bg-green-600 rounded">Accept</button>
+                            <button class="px-2 py-1 text-xs bg-gray-600 rounded">Ignore</button>
+                        </div>
+                    </div>
+                     <div class="bg-gray-900 p-3 rounded-md border border-gray-700">
+                        <p class="text-sm text-gray-400">"imediately" → "immediately"</p>
+                        <p class="text-xs mt-1">Spelling mistake.</p>
+                        <div class="mt-2 space-x-2">
+                            <button class="px-2 py-1 text-xs bg-green-600 rounded">Accept</button>
+                            <button class="px-2 py-1 text-xs bg-gray-600 rounded">Ignore</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rewrites Content (Hidden by default) -->
+                <div id="tab-content-rewrites" class="tab-content hidden space-y-4">
+                     <div class="bg-gray-900 p-3 rounded-md border border-gray-700">
+                        <p class="text-sm text-gray-400">Rewrite for Clarity</p>
+                        <p class="text-xs mt-1 text-gray-500">Original: "This is an example of a sentence that could be improved, it is written in the passive voice."</p>
+                        <p class="text-xs mt-2">Suggestion: "This sentence, written in the passive voice, could be improved."</p>
+                        <button class="mt-2 w-full text-center px-2 py-1 text-xs bg-blue-600 rounded">Rewrite Sentence</button>
+                    </div>
+                </div>
+
+                 <!-- Tone Content (Hidden by default) -->
+                <div id="tab-content-tone" class="tab-content hidden space-y-4">
+                     <div class="bg-gray-900 p-3 rounded-md border border-gray-700">
+                        <p class="text-sm text-gray-400">Detected Tone: <span class="font-bold text-yellow-400">Uncertain</span></p>
+                        <p class="text-xs mt-1">Words like "Maybe" and "think" convey uncertainty. Rewrite for a more confident tone.</p>
+                        <button class="mt-2 w-full text-center px-2 py-1 text-xs bg-purple-600 rounded">Summon AI for Rewrite</button>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+
+            // Theme Toggler
+            themeToggle.addEventListener('click', () => {
+                html.classList.toggle('dark');
+                // In a real app, you'd save this preference
+            });
+
+            // Sidebar Tab Logic
+            const tabs = document.querySelectorAll('.sidebar-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Deactivate all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.add('hidden'));
+
+                    // Activate the clicked tab
+                    tab.classList.add('active');
+                    const contentId = 'tab-content-' + tab.dataset.tab;
+                    document.getElementById(contentId).classList.remove('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
